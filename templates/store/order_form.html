@@ -1,0 +1,70 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ title }} — Обувной магазин{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-8">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-pencil me-2"></i>{{ title }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger py-2">
+                    {% for field in form %}{% for error in field.errors %}<div><strong>{{ field.label }}:</strong> {{ error }}</div>{% endfor %}{% endfor %}
+                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.order_number.label }}</label>
+                        {{ form.order_number }}
+                        <div class="form-text text-muted">Только чтение</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.order_date.label }}</label>
+                        {{ form.order_date }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.pickup_date.label }}</label>
+                        {{ form.pickup_date }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.client_full_name.label }}</label>
+                        {{ form.client_full_name }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.pickup_code.label }}</label>
+                        {{ form.pickup_code }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">{{ form.status.label }}</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ form.pickup_point.label }}</label>
+                        {{ form.pickup_point }}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-lg me-1"></i> Сохранить
+                    </button>
+                    <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg me-1"></i> Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Заказы — Обувной магазин{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-cart3 me-2"></i>Список заказов</h2>
+</div>
+
+<div class="mb-3">
+    <form method="get" class="d-flex gap-2">
+        <input type="text" name="q" class="form-control" placeholder="Поиск по номеру, ФИО, артикулу товара..." value="{{ query }}">
+        <button type="submit" class="btn btn-dark">
+            <i class="bi bi-search"></i>
+        </button>
+        {% if query %}
+        <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x"></i>
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>№ заказа</th>
+                <th>Товары</th>
+                <th>ФИО клиента</th>
+                <th>Дата заказа</th>
+                <th>Дата выдачи</th>
+                <th>Пункт выдачи</th>
+                <th>Код получения</th>
+                <th>Статус</th>
+                {% if user.can_edit_orders %}
+                <th class="text-center">Действия</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>
+                    {% for item in order.items.all %}
+                        <div><code>{{ item.product.article }}</code> × {{ item.quantity }}</div>
+                    {% empty %}
+                        —
+                    {% endfor %}
+                </td>
+                <td>{{ order.client_full_name }}</td>
+                <td>{{ order.order_date }}</td>
+                <td>{{ order.pickup_date|default:"—" }}</td>
+                <td>{{ order.pickup_point|default:"—" }}</td>
+                <td>
+                    <code>{{ order.pickup_code }}</code>
+                </td>
+                <td>
+                    {% if order.status == 'new' %}
+                        <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                    {% elif order.status == 'completed' %}
+                        <span class="badge bg-success">{{ order.get_status_display }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                {% if user.can_edit_orders %}
+                <td class="text-center text-nowrap">
+                    <a href="{% url 'order_edit' order.pk %}"
+                       class="btn btn-sm btn-outline-primary me-1" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'order_delete' order.pk %}"
+                       class="btn btn-sm btn-outline-danger" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox me-2"></i>Заказы не найдены
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted small">Всего заказов: {{ orders|length }}</p>
+{% endblock %}
